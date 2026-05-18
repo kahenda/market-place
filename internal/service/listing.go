@@ -20,6 +20,10 @@ func (s *ListingService) CreateListing(userID string, req *models.CreateListingR
 		Description: req.Description,
 		Price:       req.Price,
 		Category:    req.Category,
+		Gender:      req.Gender,
+		Size:        req.Size,
+		Condition:   req.Condition,
+		Area:        req.Area,
 	}
 	if err := s.Repo.CreateListing(listing); err != nil {
 		return nil, err
@@ -27,10 +31,6 @@ func (s *ListingService) CreateListing(userID string, req *models.CreateListingR
 	return listing, nil
 }
 
-func (s *ListingService) GetAllListings() ([]models.Listing, error) {
-	return s.Repo.GetAllListings()
-}
-
-func (s *ListingService) GetListingsByCategory(category string) ([]models.Listing, error) {
-	return s.Repo.GetListingsByCategory(category)
+func (s *ListingService) GetListings(category, gender, size, condition, area string) ([]models.Listing, error) {
+	return s.Repo.GetListings(category, gender, size, condition, area)
 }

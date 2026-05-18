@@ -38,17 +38,13 @@ func (h *ListingHandler) CreateListing(c *gin.Context) {
 }
 
 func (h *ListingHandler) GetListings(c *gin.Context) {
-	category := c.Query("category")
+	category  := c.Query("category")
+	gender    := c.Query("gender")
+	size      := c.Query("size")
+	condition := c.Query("condition")
+	area      := c.Query("area")
 
-	var listings []models.Listing
-	var err error
-
-	if category != "" {
-		listings, err = h.Service.GetListingsByCategory(category)
-	} else {
-		listings, err = h.Service.GetAllListings()
-	}
-
+	listings, err := h.Service.GetListings(category, gender, size, condition, area)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -56,5 +52,16 @@ func (h *ListingHandler) GetListings(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"listings": listings,
+		"count":    len(listings),
+	})
+}
+
+func (h *ListingHandler) GetOptions(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"categories": models.Categories,
+		"genders":    models.Genders,
+		"sizes":      models.Sizes,
+		"conditions": models.Conditions,
+		"areas":      models.KisumuAreas,
 	})
 }
