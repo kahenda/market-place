@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/kahenda/marketplace/internal/handler"
+	"github.com/kahenda/marketplace/internal/middleware"
 	"github.com/kahenda/marketplace/internal/repository"
 	"github.com/kahenda/marketplace/internal/service"
 	_ "github.com/lib/pq"
@@ -33,6 +34,10 @@ func main() {
 	userSvc := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userSvc)
 
+	listingRepo := repository.NewListingRepository(db)
+	listingSvc := service.NewListingService(listingRepo)
+	listingHandler := handler.NewListingHandler(listingSvc)
+
 	r := gin.Default()
 
 	r.GET("/health", func(c *gin.Context) {
@@ -41,6 +46,13 @@ func main() {
 
 	r.POST("/register", userHandler.Register)
 	r.POST("/login", userHandler.Login)
+
+	protected := r.Group("/")
+	protected.Use(middleware.AuthRequired())
+	{
+		protected.POST("/listings", listingHandler.CreateListing)
+		protected.GET("/listings", listingHandler.GetListings)
+	}
 
 	port := os.Getenv("PORT")
 	if port == "" {
