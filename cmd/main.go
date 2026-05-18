@@ -38,6 +38,14 @@ func main() {
 	listingSvc := service.NewListingService(listingRepo)
 	listingHandler := handler.NewListingHandler(listingSvc)
 
+	messageRepo := repository.NewMessageRepository(db)
+	messageSvc := service.NewMessageService(messageRepo)
+	messageHandler := handler.NewMessageHandler(messageSvc)
+
+	reviewRepo := repository.NewReviewRepository(db)
+	reviewSvc := service.NewReviewService(reviewRepo)
+	reviewHandler := handler.NewReviewHandler(reviewSvc)
+
 	r := gin.Default()
 
 	r.GET("/health", func(c *gin.Context) {
@@ -52,6 +60,13 @@ func main() {
 	{
 		protected.POST("/listings", listingHandler.CreateListing)
 		protected.GET("/listings", listingHandler.GetListings)
+
+		protected.POST("/messages", messageHandler.SendMessage)
+		protected.GET("/messages", messageHandler.GetConversation)
+		protected.GET("/messages/inbox", messageHandler.GetInbox)
+
+		protected.POST("/reviews", reviewHandler.CreateReview)
+		protected.GET("/reviews/:seller_id", reviewHandler.GetReviewsBySeller)
 	}
 
 	port := os.Getenv("PORT")
