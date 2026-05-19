@@ -46,7 +46,12 @@ func main() {
 	reviewSvc := service.NewReviewService(reviewRepo)
 	reviewHandler := handler.NewReviewHandler(reviewSvc)
 
+	imageRepo := repository.NewImageRepository(db)
+	imageSvc := service.NewImageService(imageRepo)
+	imageHandler := handler.NewImageHandler(imageSvc)
+
 	r := gin.Default()
+	r.MaxMultipartMemory = 8 << 20
 
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok", "message": "Kisumu Marketplace API is running"})
@@ -61,6 +66,9 @@ func main() {
 	{
 		protected.POST("/listings", listingHandler.CreateListing)
 		protected.GET("/listings", listingHandler.GetListings)
+
+		protected.POST("/listings/:listing_id/images", imageHandler.UploadImage)
+		protected.GET("/listings/:listing_id/images", imageHandler.GetImages)
 
 		protected.POST("/messages", messageHandler.SendMessage)
 		protected.GET("/messages", messageHandler.GetConversation)
