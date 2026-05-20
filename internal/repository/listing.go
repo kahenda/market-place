@@ -81,9 +81,18 @@ func (r *ListingRepository) GetListings(category, gender, size, condition, area 
 	var listings []models.Listing
 	for rows.Next() {
 		var l models.Listing
-		if err := rows.Scan(&l.ID, &l.UserID, &l.Title, &l.Description, &l.Price, &l.Category, &l.Gender, &l.Size, &l.Condition, &l.Area, &l.Status, &l.CreatedAt); err != nil {
+		var gender, size, condition, area sql.NullString
+		if err := rows.Scan(
+			&l.ID, &l.UserID, &l.Title, &l.Description,
+			&l.Price, &l.Category, &gender, &size,
+			&condition, &area, &l.Status, &l.CreatedAt,
+		); err != nil {
 			return nil, err
 		}
+		l.Gender = gender.String
+		l.Size = size.String
+		l.Condition = condition.String
+		l.Area = area.String
 		listings = append(listings, l)
 	}
 	return listings, nil
