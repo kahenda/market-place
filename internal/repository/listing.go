@@ -34,6 +34,28 @@ func (r *ListingRepository) CreateListing(listing *models.Listing) error {
 	).Scan(&listing.ID, &listing.CreatedAt)
 }
 
+func (r *ListingRepository) GetListingByID(id string) (*models.Listing, error) {
+	query := `SELECT id, user_id, title, description, price, category, gender, size, condition, area, status, created_at FROM listings WHERE id = $1`
+	var l models.Listing
+	var gender, size, condition, area sql.NullString
+	err := r.DB.QueryRow(query, id).Scan(
+		&l.ID, &l.UserID, &l.Title, &l.Description,
+		&l.Price, &l.Category, &gender, &size,
+		&condition, &area, &l.Status, &l.CreatedAt,
+	)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	l.Gender = gender.String
+	l.Size = size.String
+	l.Condition = condition.String
+	l.Area = area.String
+	return &l, nil
+}
+
 func (r *ListingRepository) GetListings(category, gender, size, condition, area string) ([]models.Listing, error) {
 	base := `SELECT id, user_id, title, description, price, category, gender, size, condition, area, status, created_at FROM listings WHERE status = 'active'`
 

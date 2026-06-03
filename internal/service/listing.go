@@ -31,6 +31,10 @@ func (s *ListingService) CreateListing(userID string, req *models.CreateListingR
 	return listing, nil
 }
 
+func (s *ListingService) GetListingByID(id string) (*models.Listing, error) {
+	return s.Repo.GetListingByID(id)
+}
+
 func (s *ListingService) GetListings(category, gender, size, condition, area string) ([]models.Listing, error) {
 	return s.Repo.GetListings(category, gender, size, condition, area)
 }

@@ -73,6 +73,7 @@ func main() {
 	{
 		protected.POST("/listings", listingHandler.CreateListing)
 		protected.GET("/listings", listingHandler.GetListings)
+		protected.GET("/listing/:id", listingHandler.GetListingByID)
 
 		protected.POST("/listings/:listing_id/images", imageHandler.UploadImage)
 		protected.GET("/listings/:listing_id/images", imageHandler.GetImages)
