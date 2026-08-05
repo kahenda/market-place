@@ -1,0 +1,6 @@
+[build]
+builder = "nixpacks"
+buildCommand = "go build -o marketplace ./cmd/main.go"
+
+[deploy]
+startCommand = "./marketplace"
