@@ -30,12 +30,21 @@ func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	user := &models.User{}
 	query := `SELECT id, name, email, password_hash, location, created_at FROM users WHERE email = $1`
 	err := r.DB.QueryRow(query, email).Scan(
-		&user.ID,
-		&user.Name,
-		&user.Email,
-		&user.PasswordHash,
-		&user.Location,
-		&user.CreatedAt,
+		&user.ID, &user.Name, &user.Email,
+		&user.PasswordHash, &user.Location, &user.CreatedAt,
+	)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	return user, err
+}
+
+func (r *UserRepository) GetUserByID(id string) (*models.User, error) {
+	user := &models.User{}
+	query := `SELECT id, name, email, location, created_at FROM users WHERE id = $1`
+	err := r.DB.QueryRow(query, id).Scan(
+		&user.ID, &user.Name, &user.Email,
+		&user.Location, &user.CreatedAt,
 	)
 	if err == sql.ErrNoRows {
 		return nil, nil

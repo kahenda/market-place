@@ -65,6 +65,7 @@ func main() {
 	r.GET("/options", listingHandler.GetOptions)
 	r.POST("/register", userHandler.Register)
 	r.POST("/login", userHandler.Login)
+	r.GET("/users/:id", userHandler.GetUser)
 
 	protected := r.Group("/")
 	protected.Use(middleware.AuthRequired())
