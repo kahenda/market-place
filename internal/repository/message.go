@@ -17,7 +17,7 @@ func (r *MessageRepository) SendMessage(msg *models.Message) error {
 	query := `
 		INSERT INTO messages (sender_id, receiver_id, listing_id, body)
 		VALUES ($1, $2, $3, $4)
-		RETURNING id, created_at`
+		RETURNING id, sent_at`
 	return r.DB.QueryRow(query,
 		msg.SenderID,
 		msg.ReceiverID,
@@ -28,14 +28,14 @@ func (r *MessageRepository) SendMessage(msg *models.Message) error {
 
 func (r *MessageRepository) GetConversation(userID1, userID2, listingID string) ([]models.Message, error) {
 	query := `
-		SELECT id, sender_id, receiver_id, listing_id, body, created_at
+		SELECT id, sender_id, receiver_id, listing_id, body, sent_at
 		FROM messages
 		WHERE listing_id = $3
 		AND (
 			(sender_id = $1 AND receiver_id = $2) OR
 			(sender_id = $2 AND receiver_id = $1)
 		)
-		ORDER BY created_at ASC`
+		ORDER BY sent_at ASC`
 	rows, err := r.DB.Query(query, userID1, userID2, listingID)
 	if err != nil {
 		return nil, err
@@ -55,10 +55,10 @@ func (r *MessageRepository) GetConversation(userID1, userID2, listingID string) 
 
 func (r *MessageRepository) GetInbox(userID string) ([]models.Message, error) {
 	query := `
-		SELECT id, sender_id, receiver_id, listing_id, body, created_at
+		SELECT id, sender_id, receiver_id, listing_id, body, sent_at
 		FROM messages
-		WHERE receiver_id = $1
-		ORDER BY created_at DESC`
+		WHERE receiver_id = $1 OR sender_id = $1
+		ORDER BY sent_at DESC`
 	rows, err := r.DB.Query(query, userID)
 	if err != nil {
 		return nil, err
